@@ -15,7 +15,7 @@ Nest js rest api on aws lambda with serverless framework
 ## Installation
 
 ```bash
-npx degit https://github.com/TheSmartMonkey/create-serverless-express-ts-service serverless-ts-service
+npx degit https://github.com/TheSmartMonkey/create-serverless-nestjs-rest-api.git nestjs-service
 ```
 
 ```bash
