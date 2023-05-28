@@ -1,0 +1,44 @@
+service: create-serverless-nestjs-rest-api
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-latest-layer-version
+  - serverless-deployment-bucket
+
+custom:
+  stageType: ${opt:stage, env:AWS_STAGE, "dev"}
+  envType: ${env:ENV_TYPE, "dev"}
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${self:custom.stageType}
+  region: 'eu-west-3'
+  environment:
+    NODE_PATH: "./:/opt/node_modules" # use lambda layer node_modules
+
+  deploymentBucket:
+    name: ${self:custom.envType}-${self:provider.region}-serverless-framework-deployment-bucket
+
+# Keep only necessary files
+package:
+  individually: true
+  exclude:
+    - ./**
+  include:
+    - 'dist/**/*'
+
+functions:
+  main:
+    handler: dist/main-serverless.handler
+    events:
+      - http:
+          method: ANY
+          path: /create-serverless-nestjs-rest-api
+      - http:
+          method: ANY
+          path: 'create-serverless-nestjs-rest-api/{proxy+}'
+    layers:
+      # Optimise lambda package size
+      - arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:layer:nestjsLayer:latest
